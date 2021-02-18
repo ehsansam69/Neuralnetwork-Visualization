@@ -7,6 +7,7 @@ import matplotlib.pyplot as plt # noqa:E402
 BLUE = "#04253a"
 GREEN = '#4C837a'
 TAN = '#e1ddbf'
+DPI = 300
 
 
 
@@ -35,8 +36,8 @@ BETWEEN_NODE_SCALE = 0.4
 
 def main():
    p = construct_parameters()
-   fig = create_background(p)
-   save_nn_viz(fig, postfix = '07_color background')
+   fig,ax_boss = create_background(p)
+   p = find_node_image_size(p)
    print("parameters: ")
    for key,value in p.items():
        print(key ," : ",value)
@@ -97,6 +98,8 @@ def construct_parameters():
         'error_gap_scale':ERROR_GAP_SCALE
     }
 
+
+
     return parameters
 
 def create_background(p):
@@ -106,7 +109,29 @@ def create_background(p):
         figsize=(p['figure']['width'],p['figure']['height']),
         linewidth = 4,
     )
-    return fig
+
+    ax_boss = fig.add_axes((0,0,1,1),facecolor = 'none')
+    ax_boss.set_xlim(0,1)
+    ax_boss.set_ylim(0, 1)
+
+    return fig,ax_boss
+
+def find_node_image_size(p):
+    total_space_to_fill= (
+        p['figure']['height']
+        -p['gap']['bottom_border']
+        -p['gap']['top_border']
+    )
+
+    height_contrained_by_height = (
+        total_space_to_fill/(
+        p['network']['max_nodes']
+        + (p['network']['max_nodes']-1)*p['gap']['between_node_scale']
+    )
+    )
+    print('height constrained by height: ', height_contrained_by_height)
+    return p
+
 def save_nn_viz(fig, postfix ="0"):
     #generate a new filename for each step
     base_name = 'nn_viz_'
@@ -114,7 +139,10 @@ def save_nn_viz(fig, postfix ="0"):
     fig.savefig(
         filename,
     edgecolor = fig.get_edgecolor(),
-    facecolor = fig.get_facecolor(),)
+    facecolor = fig.get_facecolor(),
+    dpi = DPI)
+
+
 
 if __name__ == "__main__":
     main()
