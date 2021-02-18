@@ -38,6 +38,7 @@ def main():
    p = construct_parameters()
    fig,ax_boss = create_background(p)
    p = find_node_image_size(p)
+   print("node image dimensions: ",p['node_image'])
    print("parameters: ")
    for key,value in p.items():
        print(key ," : ",value)
@@ -129,7 +130,27 @@ def find_node_image_size(p):
         + (p['network']['max_nodes']-1)*p['gap']['between_node_scale']
     )
     )
-    print('height constrained by height: ', height_contrained_by_height)
+    total_space_to_fill = (
+            p['figure']['width']
+            - p['gap']['left_border']
+            - p['gap']['right_border']
+            - 2*p['input']['image']['width']
+    )
+    width_contrained_by_width = (
+            total_space_to_fill / (
+            p['network']['n_layers']
+            + (p['network']['n_layers'] + 1) * p['gap']['between_layer_scale'])
+    )
+    height_contrained_by_width = (
+    width_contrained_by_width
+    / p['input']['aspect_ratio']
+    )
+
+    #see which contraint is more restrictive and go with it
+    p['node_image']['height'] = np.minimum(
+        height_contrained_by_height,
+        height_contrained_by_width)
+    p['node_image']['width'] = p['node_image']['height']*p['input']['aspect_ratio']
     return p
 
 def save_nn_viz(fig, postfix ="0"):
