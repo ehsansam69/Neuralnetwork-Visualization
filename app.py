@@ -152,6 +152,17 @@ def find_node_image_size(p):
         height_contrained_by_width)
     p['node_image']['width'] = p['node_image']['height']*p['input']['aspect_ratio']
     return p
+def find_gap_between_layer(p):
+    horizontal_gap_total = (
+        p['figure']['width']
+        - 2*p['input']['image']['width']
+        -p['network']['n_layers']*p['node_image']['width']
+        -p['gap']['left_border']
+        -p['gap']['right_border']
+    )
+    n_horizontal_gaps = p['network']['n_layers']+1
+    p['gap']['between_layer'] = horizontal_gap_total / n_horizontal_gaps
+    return p
 
 def save_nn_viz(fig, postfix ="0"):
     #generate a new filename for each step
