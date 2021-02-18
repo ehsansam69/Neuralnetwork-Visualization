@@ -38,6 +38,8 @@ def main():
    p = construct_parameters()
    fig,ax_boss = create_background(p)
    p = find_node_image_size(p)
+   p = find_gap_between_layer(p)
+   p = find_gap_between_node(p)
    print("node image dimensions: ",p['node_image'])
    print("parameters: ")
    for key,value in p.items():
@@ -94,7 +96,7 @@ def construct_parameters():
         'top_border':TOP_BORDER,
         'between_layer':0,
         'between_layer_scale':BETWEEN_LAYER_SCALE,
-        'bewtween_node':0,
+        'between_node':0,
         'between_node_scale':BETWEEN_NODE_SCALE,
         'error_gap_scale':ERROR_GAP_SCALE
     }
@@ -162,6 +164,16 @@ def find_gap_between_layer(p):
     )
     n_horizontal_gaps = p['network']['n_layers']+1
     p['gap']['between_layer'] = horizontal_gap_total / n_horizontal_gaps
+    return p
+def find_gap_between_node(p):
+    vertical_gap_total = (
+        p['figure']['height']
+        - p['gap']['top_border']
+        - p['gap']['bottom_border']
+        - p['network']['max_nodes']*p['node_image']['height']
+    )
+    n_vertical_gaps = p['network']['max_nodes'] - 1
+    p['gap']['between_node'] = vertical_gap_total / n_vertical_gaps
     return p
 
 def save_nn_viz(fig, postfix ="0"):
