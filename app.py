@@ -40,7 +40,8 @@ def main():
    p = find_node_image_size(p)
    p = find_gap_between_layer(p)
    p = find_gap_between_node(p)
-   print("node image dimensions: ",p['node_image'])
+   p = find_error_image_position(p)
+   print("error image position", p['error_image'])
    print("parameters: ")
    for key,value in p.items():
        print(key ," : ",value)
@@ -118,7 +119,6 @@ def create_background(p):
     ax_boss.set_ylim(0, 1)
 
     return fig,ax_boss
-
 def find_node_image_size(p):
     total_space_to_fill= (
         p['figure']['height']
@@ -175,6 +175,30 @@ def find_gap_between_node(p):
     n_vertical_gaps = p['network']['max_nodes'] - 1
     p['gap']['between_node'] = vertical_gap_total / n_vertical_gaps
     return p
+def find_error_image_position(p):
+    """
+    where exactly should the error image be positioned
+    """
+    p['error_image']['bottom'] = (
+        p['input']['image']['bottom']
+        -p['input']['image']['height']
+        *p['gap']['error_gap_scale']
+        -p['error_image']['height']
+    )
+    error_image_center = (
+        p['figure']['width']
+        -p['gap']['right_border']
+        -p['input']['image']['width'] /2
+    )
+    p['error_image']['left'] = (
+        error_image_center - p['error_image']['width']/2
+    )
+    return p
+
+
+
+
+
 
 def save_nn_viz(fig, postfix ="0"):
     #generate a new filename for each step
