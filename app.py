@@ -43,7 +43,7 @@ def main():
    p = find_error_image_position(p)
 
    add_input_image(fig, p)
-   save_nn_viz(fig, postfix="15_input_random")
+   save_nn_viz(fig, postfix="16_input_random_no_ticks")
 
    print("parameters: ")
    for key,value in p.items():
@@ -220,6 +220,10 @@ def add_input_image(fig, p):
         p['input']['n_cols']
     ))
     ax_input.imshow(fill_patch,cmap="inferno")
+    ax_input.tick_params(bottom = False,top=False,right=False,left=False)
+    ax_input.tick_params(
+        labelbottom=False, labeltop=False, labelright=False, labelleft=False
+    )
 
 
 def save_nn_viz(fig, postfix ="0"):
