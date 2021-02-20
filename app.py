@@ -43,7 +43,8 @@ def main():
    p = find_error_image_position(p)
 
    add_input_image(fig, p)
-   save_nn_viz(fig, postfix="19_input_random_refactored")
+   add_node_images(fig,p)
+   save_nn_viz(fig, postfix="21_layer_0")
 
    print("parameters: ")
    for key,value in p.items():
@@ -211,7 +212,6 @@ def add_input_image(fig, p):
     ax_input = add_image_axes(fig,p,absolute_pos)
     add_filler_image(ax_input, p['input']['n_rows'],
         p['input']['n_cols'])
-
 def add_image_axes(fig,p,absolute_pos):
     scaled_pos = (
         absolute_pos[0] / p['figure']['width'],
@@ -235,6 +235,37 @@ def add_filler_image(ax,n_im_rows,n_im_cols):
     """
     fill_patch = np.random.sample(size=(n_im_rows,n_im_cols))
     ax.imshow(fill_patch, cmap='inferno')
+def add_node_images(fig,p):
+    node_image_left = (
+        p['gap']['left_border']
+        +p['input']['image']['width']
+        +p['gap']['between_layer']
+    )
+    n_nodes = p['network']['n_nodes'][0]
+    total_layer_height = (
+        n_nodes*p['node_image']['height']
+        +(n_nodes-1)*p['gap']['between_node']
+    )
+
+    layer_bottom = (p['figure']['height'] - total_layer_height)/2
+
+    for i_node in range(n_nodes):
+        node_image_bottom = (layer_bottom + i_node *(
+            p['node_image']['height'] + p['gap']['between_node'])
+        )
+        absolute_pos = (
+            node_image_left,
+            node_image_bottom,
+            p['node_image']['width'],
+            p['node_image']['height']
+        )
+        ax = add_image_axes(fig, p, absolute_pos)
+        add_filler_image(
+            ax,
+            p['input']['n_rows'],
+            p['input']['n_cols'],
+        )
+
 
 
 def save_nn_viz(fig, postfix ="0"):
