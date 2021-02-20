@@ -43,8 +43,9 @@ def main():
    p = find_error_image_position(p)
 
    add_input_image(fig, p)
-   add_node_images(fig,p)
-   save_nn_viz(fig, postfix="21_layer_0")
+   for i_layer in range(p['network']['n_layers']):
+       add_node_images(fig,i_layer,p)
+   save_nn_viz(fig, postfix="22_alllayers")
 
    print("parameters: ")
    for key,value in p.items():
@@ -235,13 +236,14 @@ def add_filler_image(ax,n_im_rows,n_im_cols):
     """
     fill_patch = np.random.sample(size=(n_im_rows,n_im_cols))
     ax.imshow(fill_patch, cmap='inferno')
-def add_node_images(fig,p):
+def add_node_images(fig,i_layer,p):
     node_image_left = (
         p['gap']['left_border']
         +p['input']['image']['width']
-        +p['gap']['between_layer']
+        +i_layer*p['node_image']['width']
+        +(i_layer+1)*p['gap']['between_layer']
     )
-    n_nodes = p['network']['n_nodes'][0]
+    n_nodes = p['network']['n_nodes'][i_layer]
     total_layer_height = (
         n_nodes*p['node_image']['height']
         +(n_nodes-1)*p['gap']['between_node']
