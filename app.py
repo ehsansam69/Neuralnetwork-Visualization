@@ -44,17 +44,23 @@ def main():
    p = find_gap_between_node(p)
    p = find_error_image_position(p)
 
+
    filler_image = load_filler_image()
-   add_input_image(fig, p,filler_image)
+   image_axes =[]
+   add_input_image(fig,image_axes, p,filler_image)
    for i_layer in range(p['network']['n_layers']):
-       add_node_images(fig,i_layer,p,filler_image)
-   add_output_image(fig, p,filler_image)
-   add_error_image(fig, p,filler_image)
+       add_node_images(fig,i_layer,image_axes,p,filler_image)
+   add_output_image(fig,image_axes, p,filler_image)
+   add_error_image(fig,image_axes, p,filler_image)
+   for i_layer , layer in enumerate(image_axes):
+       print(f"layer {i_layer -1}: {len(layer)} axes")
    save_nn_viz(fig, postfix="25_filler_image")
+   print(image_axes)
 
    print("parameters: ")
    for key,value in p.items():
        print(key ," : ",value)
+
 
 def construct_parameters():
     """
@@ -204,7 +210,7 @@ def find_error_image_position(p):
         error_image_center - p['error_image']['width']/2
     )
     return p
-def add_input_image(fig, p,filler_image):
+def add_input_image(fig,image_axes, p,filler_image):
     """
     All axes to be added use the rectangle specification
     (left,bottom,width,height)
@@ -222,6 +228,7 @@ def add_input_image(fig, p,filler_image):
         p['input']['n_cols'],
         filler_image,
     )
+    image_axes.append([ax_input])
 def add_image_axes(fig,p,absolute_pos):
     scaled_pos = (
         absolute_pos[0] / p['figure']['width'],
@@ -239,16 +246,16 @@ def add_image_axes(fig,p,absolute_pos):
     ax.spines['left'].set_color(TAN)
     ax.spines['right'].set_color(TAN)
     return ax
-# def add_filler_image(ax,n_im_rows,n_im_cols):
+# def add_filler_image(ax,n_im_rows,n_im_cols):  #random filler
 #     """
 #     add chunk of images as a place holder.
 #     """fill_patch = np.random.sample(size=(n_im_rows,n_im_cols))
 #     ax.imshow(fill_patch, cmap='inferno')
-def add_node_images(fig,i_layer,p,filler_image):
+def add_node_images(fig,i_layer,image_axes,p,filler_image):
     node_image_left = (
         p['gap']['left_border']
         +p['input']['image']['width']
-        +i_layer*p['node_image']['width']
+        + i_layer *p['node_image']['width']
         +(i_layer+1)*p['gap']['between_layer']
     )
     n_nodes = p['network']['n_nodes'][i_layer]
@@ -258,6 +265,7 @@ def add_node_images(fig,i_layer,p,filler_image):
     )
 
     layer_bottom = (p['figure']['height'] - total_layer_height)/2
+    layer_axes =[]
 
     for i_node in range(n_nodes):
         node_image_bottom = (layer_bottom + i_node *(
@@ -276,7 +284,9 @@ def add_node_images(fig,i_layer,p,filler_image):
             p['input']['n_cols'],
             filler_image
         )
-def add_output_image(fig,p,filler_image):
+        layer_axes.append(ax)
+    image_axes.append(layer_axes)
+def add_output_image(fig,image_axes,p,filler_image):
     output_image_left = (
         p['figure']['width']
         -p['input']['image']['width']
@@ -295,7 +305,8 @@ def add_output_image(fig,p,filler_image):
         p['input']['n_cols'],
         filler_image
     )
-def add_error_image(fig, p,filler_image):
+    image_axes.append([ax_output])
+def add_error_image(fig,image_axes, p,filler_image):
     absolute_pos = (
         p['error_image']['left'],
         p['error_image']['bottom'],
@@ -324,9 +335,6 @@ def add_filler_image(ax,n_im_rows,n_im_cols,filler_image):
     right = left + n_im_cols
     fill_patch = filler_image[top:bottom,left:right]
     ax.imshow(fill_patch,cmap="inferno")
-
-
-
 
 
 
