@@ -52,9 +52,8 @@ def main():
        add_node_images(fig,i_layer,image_axes,p,filler_image)
    add_output_image(fig,image_axes, p,filler_image)
    add_error_image(fig,image_axes, p,filler_image)
-   for i_layer , layer in enumerate(image_axes):
-       print(f"layer {i_layer -1}: {len(layer)} axes")
-   save_nn_viz(fig, postfix="25_filler_image")
+   add_layer_connection(ax_boss, image_axes)
+   save_nn_viz(fig, postfix="27_single_connection")
    print(image_axes)
 
    print("parameters: ")
@@ -335,6 +334,31 @@ def add_filler_image(ax,n_im_rows,n_im_cols,filler_image):
     right = left + n_im_cols
     fill_patch = filler_image[top:bottom,left:right]
     ax.imshow(fill_patch,cmap="inferno")
+def add_layer_connection(ax_boss, image_axes):
+    """
+    Add in the connectors between all layers
+    Treat the input image as the first layer and output layer as last
+    """
+    x_start = image_axes[0][0].get_position().x1
+    x_end = image_axes[1][0].get_position().x0
+
+    ax_start = image_axes[0][0]
+    ax_start_pos = ax_start.get_position()
+    y_start_min = ax_start_pos.y0
+    y_start_max = ax_start_pos.y1
+    y_start = (y_start_max+y_start_min) / 2
+
+    ax_end = image_axes[1][0]
+    ax_end_pos = ax_end.get_position()
+    y_end_min = ax_end_pos.y0
+    y_end_max = ax_end_pos.y1
+    y_end = (y_end_max+y_end_min) /2
+
+    x = [x_start, x_end]
+    y = [y_start, y_end]
+    ax_boss.plot(x, y, color =TAN)
+
+
 
 
 
