@@ -45,7 +45,8 @@ def main():
    add_input_image(fig, p)
    for i_layer in range(p['network']['n_layers']):
        add_node_images(fig,i_layer,p)
-   save_nn_viz(fig, postfix="22_alllayers")
+   add_output_image(fig, p)
+   save_nn_viz(fig, postfix="23_output_image")
 
    print("parameters: ")
    for key,value in p.items():
@@ -267,6 +268,24 @@ def add_node_images(fig,i_layer,p):
             p['input']['n_rows'],
             p['input']['n_cols'],
         )
+def add_output_image(fig,p):
+    output_image_left = (
+        p['figure']['width']
+        -p['input']['image']['width']
+        -p['gap']['right_border']
+    )
+    absolute_pos = (
+        output_image_left,
+        p['input']['image']['bottom'],
+        p['input']['image']['width'],
+        p['input']['image']['height']
+    )
+    ax_output = add_image_axes(fig,p,absolute_pos)
+    add_filler_image(
+        ax_output,
+        p['input']['n_rows'],
+        p['input']['n_cols'],
+    )
 
 
 
