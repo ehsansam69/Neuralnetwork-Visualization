@@ -2,6 +2,7 @@ import numpy as np
 import matplotlib
 matplotlib.use('agg')
 import matplotlib.pyplot as plt # noqa:E402
+from PIL import Image #noqa:E402
 
 #choose a color pallete
 BLUE = "#04253a"
@@ -9,7 +10,8 @@ GREEN = '#4C837a'
 TAN = '#e1ddbf'
 DPI = 300
 
-
+#This in an image will be used
+FILLER_IMAGE_FILENAME = "pic.png"
 
 """
 Generate a auto encoder neural network visualization
@@ -42,12 +44,13 @@ def main():
    p = find_gap_between_node(p)
    p = find_error_image_position(p)
 
-   add_input_image(fig, p)
+   filler_image = load_filler_image()
+   add_input_image(fig, p,filler_image)
    for i_layer in range(p['network']['n_layers']):
-       add_node_images(fig,i_layer,p)
-   add_output_image(fig, p)
-   add_error_image(fig, p)
-   save_nn_viz(fig, postfix="24_error_image")
+       add_node_images(fig,i_layer,p,filler_image)
+   add_output_image(fig, p,filler_image)
+   add_error_image(fig, p,filler_image)
+   save_nn_viz(fig, postfix="25_filler_image")
 
    print("parameters: ")
    for key,value in p.items():
@@ -201,7 +204,7 @@ def find_error_image_position(p):
         error_image_center - p['error_image']['width']/2
     )
     return p
-def add_input_image(fig, p):
+def add_input_image(fig, p,filler_image):
     """
     All axes to be added use the rectangle specification
     (left,bottom,width,height)
@@ -213,8 +216,12 @@ def add_input_image(fig, p):
         p['input']['image']['height']
     )
     ax_input = add_image_axes(fig,p,absolute_pos)
-    add_filler_image(ax_input, p['input']['n_rows'],
-        p['input']['n_cols'])
+    add_filler_image(
+        ax_input,
+        p['input']['n_rows'],
+        p['input']['n_cols'],
+        filler_image,
+    )
 def add_image_axes(fig,p,absolute_pos):
     scaled_pos = (
         absolute_pos[0] / p['figure']['width'],
@@ -232,13 +239,12 @@ def add_image_axes(fig,p,absolute_pos):
     ax.spines['left'].set_color(TAN)
     ax.spines['right'].set_color(TAN)
     return ax
-def add_filler_image(ax,n_im_rows,n_im_cols):
-    """
-    add chunk of images as a place holder.
-    """
-    fill_patch = np.random.sample(size=(n_im_rows,n_im_cols))
-    ax.imshow(fill_patch, cmap='inferno')
-def add_node_images(fig,i_layer,p):
+# def add_filler_image(ax,n_im_rows,n_im_cols):
+#     """
+#     add chunk of images as a place holder.
+#     """fill_patch = np.random.sample(size=(n_im_rows,n_im_cols))
+#     ax.imshow(fill_patch, cmap='inferno')
+def add_node_images(fig,i_layer,p,filler_image):
     node_image_left = (
         p['gap']['left_border']
         +p['input']['image']['width']
@@ -268,8 +274,9 @@ def add_node_images(fig,i_layer,p):
             ax,
             p['input']['n_rows'],
             p['input']['n_cols'],
+            filler_image
         )
-def add_output_image(fig,p):
+def add_output_image(fig,p,filler_image):
     output_image_left = (
         p['figure']['width']
         -p['input']['image']['width']
@@ -286,8 +293,9 @@ def add_output_image(fig,p):
         ax_output,
         p['input']['n_rows'],
         p['input']['n_cols'],
+        filler_image
     )
-def add_error_image(fig, p):
+def add_error_image(fig, p,filler_image):
     absolute_pos = (
         p['error_image']['left'],
         p['error_image']['bottom'],
@@ -299,7 +307,23 @@ def add_error_image(fig, p):
         ax_error,
         p['input']['n_rows'],
         p['input']['n_cols'],
+        filler_image
     )
+def load_filler_image():
+    img = Image.open(FILLER_IMAGE_FILENAME)
+    img.load()
+    color_img = np.asarray(img, dtype="int32")
+    #average the three color channels together to create a monochrom image
+    # bw_img = np.mean(color_img,axis=2, dtype="int32")
+    return color_img
+def add_filler_image(ax,n_im_rows,n_im_cols,filler_image):
+    #add a chunk of image as a place holder
+    top = np.random.randint(filler_image.shape[0] - n_im_rows)
+    left = np.random.randint(filler_image.shape[1] - n_im_cols)
+    bottom = top +n_im_rows
+    right = left + n_im_cols
+    fill_patch = filler_image[top:bottom,left:right]
+    ax.imshow(fill_patch,cmap="inferno")
 
 
 
