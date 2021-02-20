@@ -43,7 +43,7 @@ def main():
    p = find_error_image_position(p)
 
    add_input_image(fig, p)
-   save_nn_viz(fig, postfix="18_input_random_refactored")
+   save_nn_viz(fig, postfix="19_input_random_refactored")
 
    print("parameters: ")
    for key,value in p.items():
@@ -209,12 +209,8 @@ def add_input_image(fig, p):
         p['input']['image']['height']
     )
     ax_input = add_image_axes(fig,p,absolute_pos)
-
-    fill_patch = np.random.sample(size=(
-        p['input']['n_rows'],
-        p['input']['n_cols']
-    ))
-    ax_input.imshow(fill_patch,cmap="inferno")
+    add_filler_image(ax_input, p['input']['n_rows'],
+        p['input']['n_cols'])
 
 def add_image_axes(fig,p,absolute_pos):
     scaled_pos = (
@@ -233,8 +229,12 @@ def add_image_axes(fig,p,absolute_pos):
     ax.spines['left'].set_color(TAN)
     ax.spines['right'].set_color(TAN)
     return ax
-
-
+def add_filler_image(ax,n_im_rows,n_im_cols):
+    """
+    add chunk of images as a place holder.
+    """
+    fill_patch = np.random.sample(size=(n_im_rows,n_im_cols))
+    ax.imshow(fill_patch, cmap='inferno')
 
 
 def save_nn_viz(fig, postfix ="0"):
@@ -246,8 +246,6 @@ def save_nn_viz(fig, postfix ="0"):
     edgecolor = fig.get_edgecolor(),
     facecolor = fig.get_facecolor(),
     dpi = DPI)
-
-
 
 if __name__ == "__main__":
     main()
