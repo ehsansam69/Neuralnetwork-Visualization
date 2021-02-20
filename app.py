@@ -53,7 +53,7 @@ def main():
    add_output_image(fig,image_axes, p,filler_image)
    add_error_image(fig,image_axes, p,filler_image)
    add_layer_connection(ax_boss, image_axes)
-   save_nn_viz(fig, postfix="29_all_layer_connection")
+   save_nn_viz(fig, postfix="30_spaceout_connection")
    print(image_axes)
 
    print("parameters: ")
@@ -340,23 +340,28 @@ def add_layer_connection(ax_boss, image_axes):
     Treat the input image as the first layer and output layer as last
     """
     for i_start_layer in range(len(image_axes)-1):
+        n_start_nodes = len(image_axes[i_start_layer])
+        n_end_nodes = len(image_axes[i_start_layer +1])
         x_start = image_axes[i_start_layer][0].get_position().x1
         x_end = image_axes[i_start_layer+1][0].get_position().x0
 
-        for ax_start in image_axes[i_start_layer]:
+        for i_start_ax , ax_start in enumerate(image_axes[i_start_layer]):
             ax_start_pos = ax_start.get_position()
             y_start_min = ax_start_pos.y0
             y_start_max = ax_start_pos.y1
             y_start = (y_start_max + y_start_min) / 2
+            start_spacing = (y_start_max - y_start_min)/(n_end_nodes+1)
 
-            for ax_end in image_axes[i_start_layer + 1]:
+            for i_end_ax, ax_end in enumerate(image_axes[i_start_layer + 1]):
                 ax_end_pos = ax_end.get_position()
                 y_end_min = ax_end_pos.y0
                 y_end_max = ax_end_pos.y1
                 y_end = (y_end_max + y_end_min) / 2
+                end_spacing = (y_end_max -y_end_min) / (n_start_nodes + 1)
 
+                #spread out y_start and y_end a bit
                 x = [x_start, x_end]
-                y = [y_start, y_end]
+                y = [y_start_min+start_spacing*(i_end_ax+1), y_end_min+end_spacing*(i_start_ax +1)]
                 ax_boss.plot(x, y, color=BLUE)
 
 
