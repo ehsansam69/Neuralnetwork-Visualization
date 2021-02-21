@@ -11,12 +11,17 @@ TAN = '#e1ddbf'
 DPI = 300
 
 #This in an image will be used
-FILLER_IMAGE_FILENAME = "pic.png"
+FILLER_IMAGE_FILENAME = "pic7.jpg"
 
 """
 Generate a auto encoder neural network visualization
 """
 #changing this adjust the size and layout of the visualization
+number_of_layers = int(input("How many layers? "))
+N_NODES_BY_LAYER = []
+for layer in range(number_of_layers):
+    a = int(input("number of node in layer?"))
+    N_NODES_BY_LAYER.append(a)
 
 FIGURE_WIDTH = 16
 FIGURE_HEIGHT = 9
@@ -27,7 +32,7 @@ BOTTOM_BORDER =0.6
 
 N_IMAGE_PIXEL_COLS = 64
 N_IMAGE_PIXEL_ROWS =48
-N_NODES_BY_LAYER =[10,7,5,8]
+#N_NODES_BY_LAYER =[10,7,5,8]
 
 INPUT_IMAGE_BOTTOM = 5
 INPUT_IMAGE_HEIGHT =0.25*FIGURE_HEIGHT
@@ -53,7 +58,7 @@ def main():
    add_output_image(fig,image_axes, p,filler_image)
    add_error_image(fig,image_axes, p,filler_image)
    add_layer_connection(ax_boss, image_axes)
-   save_nn_viz(fig, postfix="30_spaceout_connection")
+   save_nn_viz(fig, postfix="test.png")
    print(image_axes)
 
    print("parameters: ")
@@ -324,8 +329,8 @@ def load_filler_image():
     img.load()
     color_img = np.asarray(img, dtype="int32")
     #average the three color channels together to create a monochrom image
-    # bw_img = np.mean(color_img,axis=2, dtype="int32")
-    return color_img
+    bw_img = np.mean(color_img,axis=2, dtype="int32")
+    return bw_img
 def add_filler_image(ax,n_im_rows,n_im_cols,filler_image):
     #add a chunk of image as a place holder
     top = np.random.randint(filler_image.shape[0] - n_im_rows)
@@ -362,8 +367,13 @@ def add_layer_connection(ax_boss, image_axes):
                 #spread out y_start and y_end a bit
                 x = [x_start, x_end]
                 y = [y_start_min+start_spacing*(i_end_ax+1), y_end_min+end_spacing*(i_start_ax +1)]
-                ax_boss.plot(x, y, color=BLUE)
-
+                plot_connection(ax_boss, x_start,x_end,y_start,y_end)
+def plot_connection(ax_boss, x0, x1, y0, y1):
+    # for curvy connection
+    weight = np.random.sample() *2 -1
+    x = np.linspace(x0, x1, num = 50)
+    y = y0 + (y1 - y0) * (-np.cos(np.pi * (x - x0)/(x1 - x0))+ 1)/2
+    ax_boss.plot(x, y, color = BLUE, linewidth = 3 *weight)
 
 
 def save_nn_viz(fig, postfix ="0"):
