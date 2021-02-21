@@ -373,7 +373,11 @@ def plot_connection(ax_boss, x0, x1, y0, y1):
     weight = np.random.sample() *2 -1
     x = np.linspace(x0, x1, num = 50)
     y = y0 + (y1 - y0) * (-np.cos(np.pi * (x - x0)/(x1 - x0))+ 1)/2
-    ax_boss.plot(x, y, color = BLUE, linewidth = 3 *weight)
+    if weight>0:
+        conn_color = TAN
+    else:
+        conn_color = BLUE
+    ax_boss.plot(x, y, color = conn_color, linewidth = 3 *weight)
 
 
 def save_nn_viz(fig, postfix ="0"):
